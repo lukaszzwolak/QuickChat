@@ -4,13 +4,15 @@ const http = require("http");
 const WebSocket = require("ws");
 
 const app = express();
+const PORT = 3000;
+
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-//serwowanie statycznych plikow z folderu clienta
+// Serwowanie statycznych plików z folderu client
 app.use(express.static(path.join(__dirname, "client")));
 
-//obsluga WebSocket
+// Obsługa WebSocket
 wss.on("connection", (ws) => {
   console.log("New client connection");
 
@@ -18,7 +20,7 @@ wss.on("connection", (ws) => {
     const parsed = JSON.parse(message);
     console.log("Received:", parsed);
 
-    //emicsja wiadomości do wszystkich klientów
+    // Emisja wiadomości do wszystkich klientów
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(parsed));
@@ -31,8 +33,7 @@ wss.on("connection", (ws) => {
   });
 });
 
-//start serwera
-const PORT = process.env.PORT || 3000;
+// Start serwera
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
