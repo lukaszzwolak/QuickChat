@@ -7,6 +7,13 @@ const messageContentInput = document.getElementById("message-content");
 
 let userName = "";
 
+const socket = io();
+
+// nasłuchiwacz
+socket.on("message", ({ author, content }) => {
+  addMessage(author, content);
+});
+
 // login form handler
 const login = (event) => {
   event.preventDefault();
@@ -38,6 +45,7 @@ const sendMessage = (event) => {
   }
 
   addMessage(userName, messageContent);
+  socket.emit("message", { author: userName, content: messageContent });
   messageContentInput.value = "";
 };
 
