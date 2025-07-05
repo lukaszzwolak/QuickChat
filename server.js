@@ -14,7 +14,7 @@ const messages = [];
 // Serwowanie statycznych plików z folderu client
 app.use(express.static(path.join(__dirname, "client")));
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "client", "index.html"));
 });
 
