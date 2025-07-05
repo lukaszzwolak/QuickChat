@@ -14,6 +14,14 @@ socket.on("message", ({ author, content }) => {
   addMessage(author, content);
 });
 
+socket.on("newUser", (name) => {
+  addMessage("Chat Bot", `${name} has joined the conversation!`);
+});
+
+socket.on("removeUser", (name) => {
+  addMessage("Chat Bot", `${name} has left the conversation... :(`);
+});
+
 // login form handler
 const login = (event) => {
   event.preventDefault();
@@ -26,6 +34,8 @@ const login = (event) => {
   }
 
   userName = enteredName;
+
+  socket.emit("join", userName);
 
   loginForm.classList.remove("show");
   messagesSection.classList.add("show");
