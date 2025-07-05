@@ -1,15 +1,9 @@
 const express = require("express");
 const path = require("path");
-const http = require("http");
-const WebSocket = require("ws");
+const socket = require("socket.io");
 
 const app = express();
 const PORT = 3000;
-
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-const messages = [];
 
 // Serwowanie statycznych plików z folderu client
 app.use(express.static(path.join(__dirname, "client")));
@@ -18,28 +12,28 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, "client", "index.html"));
 });
 
-// Obsługa WebSocket
-wss.on("connection", (ws) => {
-  console.log("New client connection");
-
-  ws.on("message", (message) => {
-    const parsed = JSON.parse(message);
-    console.log("Received:", parsed);
-
-    // Emisja wiadomości do wszystkich klientów
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(parsed));
-      }
-    });
-  });
-
-  ws.on("close", () => {
-    console.log("Client disconnected");
-  });
-});
-
-// Start serwera
-server.listen(PORT, () => {
+// Start serwera + inicjalizacja Socket.IO
+const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+});
+const io = socket(server);
+
+// Tablica wiadomości
+const messages = [];
+
+// Obsługa połączeń WebSocket przez Socket.IO
+io.on("connection", (socket) => {
+  console.log("New client! Its id – " + socket.id);
+
+  socket.on("message", (message) => {
+    console.log("Oh, I've got something from " + socket.id);
+    messages.push(message);
+    socket.broadcast.emit("message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Oh, socket " + socket.id + " has left");
+  });
+
+  console.log("I've added a listener on message and disconnect events\n");
 });
