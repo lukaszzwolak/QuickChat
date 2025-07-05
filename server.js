@@ -9,8 +9,14 @@ const PORT = 3000;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+const messages = [];
+
 // Serwowanie statycznych plików z folderu client
 app.use(express.static(path.join(__dirname, "client")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "index.html"));
+});
 
 // Obsługa WebSocket
 wss.on("connection", (ws) => {
