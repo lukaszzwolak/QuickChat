@@ -11,7 +11,7 @@ const wss = new WebSocket.Server({ server });
 app.use(express.static(path.join(__dirname, "client")));
 
 //obsluga WebSocket
-wss.on("conection", (ws) => {
+wss.on("connection", (ws) => {
   console.log("New client connection");
 
   ws.on("message", (message) => {
